@@ -4,7 +4,7 @@
 # compiler options, debug and performance
 cppDebug = g++ -std=c++17 -Wall -Wextra -Wpedantic
 cppPerf = g++ -std=c++17 -O3
-cppCompiler = cppDebug #the version used
+cppCompiler = ${cppDebug} #the version used
 
 # list of binaries to clean as well
 binaries = ADD file names
@@ -18,7 +18,7 @@ tally: tally.f90
 
 # Create any object files needed
 %.o: %.f90
-	${coarray_compiler} -c $<
+	${cppCompiler} -c $<
 
 
 clean:
