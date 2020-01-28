@@ -13,7 +13,7 @@ binaries = multiply
 all:
 	@echo "This does nothing. See Makefile"
 
-multiply: multiply.cpp
+multiply.exe: multiply.cpp
 	${cppCompiler} $< -o $@
 
 # Create any object files needed

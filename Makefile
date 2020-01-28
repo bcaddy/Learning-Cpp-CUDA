@@ -13,7 +13,7 @@ binaries = ADD file names
 all:
 	@echo "This does nothing. See Makefile"
 
-tally: tally.f90
+tally.exe: tally.f90
 	${cppCompiler} $< -o $@
 
 # Create any object files needed
