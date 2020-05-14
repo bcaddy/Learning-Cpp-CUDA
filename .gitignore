@@ -1,10 +1,8 @@
 # Files specific to this repo #
 ##############################
-Course-materials/
-01-CUDA-C-Basics.pdf
-Introduction to CUDA C++.mp4
 keyboard-shortcuts-macos.pdf
-CUDA\ Class/
+*.pdf
+*.mp4
 
 # Compiled source #
 ###################
