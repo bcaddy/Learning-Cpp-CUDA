@@ -21,7 +21,7 @@ __global__ void vadd(const float *A, const float *B, float *C, int ds){
 
   int idx = threadIdx.x; // create typical 1D thread index from built-in variables
   if (idx < ds)
-    C[idx] = A[idx] + B[idx]  // do the vector (element) add here
+    C[idx] = A[idx] + B[idx];  // do the vector (element) add here
 }
 
 int main(){
