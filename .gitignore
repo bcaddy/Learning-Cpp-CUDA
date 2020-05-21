@@ -3,6 +3,7 @@
 keyboard-shortcuts-macos.pdf
 *.pdf
 *.mp4
+test.cpp
 
 # Compiled source #
 ###################
@@ -35,6 +36,7 @@ a.out
 *.log
 *.sql
 *.sqlite
+.vscode
 
 # OS generated files #
 ######################
