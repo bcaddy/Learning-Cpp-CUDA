@@ -51,8 +51,9 @@ int main()
     const  int numGhosts   = 2;                                       // Number of ghost cells
     const  int size        = PhysSize + 2 * numGhosts;                // total size of the array
     const  double CFLNum   = 0.4;                                     // CFL Number
-    double vel             = 0.01;                                    // Velocity in meters/second
-    const  int numSteps    = 100;                                     // Number of steps to compute
+    double vel             = 1.;                                      // Velocity in meters/second
+    const double period    = length / vel;                            // Time for one period
+    const double maxTime   = 1.5*period;                              // Time to simlate to
 
     // Conserved quantity
     std::vector<double> a(size); // Actual array
@@ -78,19 +79,21 @@ int main()
     saveArray(a, outFile, numGhosts);
 
     //=== Begin the main evolution loop ========================================
-    for (size_t step = 0; step < numSteps; step++)
+    int step = 0;
+    double time = 0;
+    while (time <= maxTime)
     {
-        for (size_t i = numGhosts; i < (size-numGhosts-1); i++)
+        // Compute the time step using the CFL condition
+        double deltat = CFLNum * deltax / vel;
+
+        for (int i = numGhosts; i < (size-numGhosts); i++)
         {
             // Set boundary conditions (periodic)
-            for (size_t j = 0; j < numGhosts; j++)
+            for (int j = 0; j < numGhosts; j++)
             {
-                a[j]                    = a[size - (j+1+numGhosts)];
-                a[size - (numGhosts-j)] = a[j+numGhosts];
+                a[j] = a.end()[-(2*numGhosts-j)];
+                a.end()[-(numGhosts-j)] = a[j+numGhosts];
             }
-
-            // Compute the time step using the CFL condition
-            double deltat = CFLNum * deltax * vel;
 
             // Computer interface states and solve Riemann problem
             double LeftInterface;
@@ -120,7 +123,7 @@ int main()
             aTemp[i] = (FluxDerivative * deltat) + a[i];
         }; // End of loop to interate through array
 
-        // Copy values form aTemp to a
+        // Copy values from aTemp to a
         for (int i = numGhosts; i < (size - numGhosts); i++)
         {
             a[i] = aTemp[i];
@@ -130,7 +133,11 @@ int main()
         saveArray(a, outFile, numGhosts);
 
         // Message
-         cout << "Completeted step: " << step << endl;
+        cout << "Completeted step: " << step << endl;
+
+        // Update time and step number
+        time += deltat;
+        step++;
 
     }; // End of evolution loop
 
