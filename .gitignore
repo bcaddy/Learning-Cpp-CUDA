@@ -4,6 +4,7 @@ keyboard-shortcuts-macos.pdf
 *.pdf
 *.mp4
 test.cpp
+.csv
 
 # Compiled source #
 ###################
