@@ -36,7 +36,9 @@ def main():
 
     for i in range(0, len(file[:,0])):
         plt.figure(1)
-        plt.plot(positions,file[i,:])
+        plt.plot(positions,file[i,:],
+                 linestyle='-',
+                 color='blue')
     
         plt.xlabel("Position")
         plt.ylabel("Value of a")
