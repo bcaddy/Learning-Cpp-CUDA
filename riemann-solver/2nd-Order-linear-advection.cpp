@@ -29,7 +29,7 @@ void saveArray(const std::vector<double>& arr,
     
     if (fileName.is_open())
     {
-        for (int i = numGhosts; i < (size - numGhosts - 1); i++)
+        for (int i = numGhosts; i < (size - numGhosts); i++)
         {
             fileName << arr[i] << ",";
         }
@@ -121,7 +121,7 @@ int main()
         }; // End of loop to interate through array
 
         // Copy values form aTemp to a
-        for (size_t i = numGhosts; i < (size - numGhosts - 1); i++)
+        for (int i = numGhosts; i < (size - numGhosts); i++)
         {
             a[i] = aTemp[i];
         };
