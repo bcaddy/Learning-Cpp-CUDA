@@ -37,6 +37,7 @@ def main():
     
     # Plotting info
     numFrames = 100
+    delay = (10./numFrames)*1000
     stride = len(file[:,0])//numFrames
     
     # Find mins and maxes
@@ -45,7 +46,7 @@ def main():
     large = file.max() + pad
     
     
-
+    name = 0
     for i in range(0, len(file[:,0]), stride):
         plt.figure(1)
         plt.plot(positions,file[i,:],
@@ -59,13 +60,15 @@ def main():
         plt.title("Solution to top hat")
         plt.tight_layout()
         
-        plt.savefig(f'images/{i}.png',
+        plt.savefig(f'images/img{str(name).zfill(4)}.png',
                     bbox='tight',
                     dpi=150)
         plt.close('all')
-
+        name += 1
     if (socket.gethostname()[7:] == "crc.pitt.edu" ):
-        os.system("convert images/*.png animated.gif")
+        os.system("ffmpeg -f image2 -i images/img%04d.png images/video.avi")
+        os.system("ffmpeg -i images/video.avi -pix_fmt rgb24  animated.gif")
+        os.system("rm -f images/video.avi")
 
 main()
 print(f'\nTime to execute: {round(default_timer()-start,2)} seconds')
