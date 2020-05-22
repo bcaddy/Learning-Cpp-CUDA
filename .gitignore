@@ -5,6 +5,8 @@ keyboard-shortcuts-macos.pdf
 *.mp4
 test.cpp
 *.csv
+*.png
+*.gif
 
 # Compiled source #
 ###################
