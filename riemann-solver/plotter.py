@@ -19,6 +19,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from timeit import default_timer
+import socket
+import os
 # import donemusic
 
 plt.close('all')
@@ -49,10 +51,8 @@ def main():
                     bbox='tight',
                     dpi=150)
 
-
-
-
-
+    if (socket.gethostname()[7:] == "crc.pitt.edu" ):
+        os.system("convert images/*.png animated.gif")
 
 main()
 print(f'\nTime to execute: {round(default_timer()-start,2)} seconds')
