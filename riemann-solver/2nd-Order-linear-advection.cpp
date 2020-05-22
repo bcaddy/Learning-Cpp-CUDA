@@ -14,16 +14,35 @@
 */
 
 #include <iostream>
+#include <fstream>
 #include <chrono>
 #include <vector>
 using namespace std::chrono;
 using std::cout;
 using std::endl;
 
+void saveArray(const std::vector<double>& arr, 
+               std::ofstream& fileName, 
+               const int& numGhosts)
+{
+    int size = arr.size();
+    
+    if (fileName.is_open())
+    {
+        for (int i = numGhosts; i < (size - numGhosts - 1); i++)
+        {
+            fileName << arr[i] << ",";
+        }
+        fileName << endl;
+    }
+    else {cout << "File not open";}
+}
+
 int main()
 {
-    // Start timer
+    // Start timer and open file
     auto start = high_resolution_clock::now();
+    std::ofstream outFile("results.csv");
 
     // Setup Initial conditions
     const  double length   = 1.;                                      // Length of problem in meters
@@ -56,7 +75,7 @@ int main()
             a[i] = 0.;
         };
     };
-
+    saveArray(a, outFile, numGhosts);
 
     //=== Begin the main evolution loop ========================================
     for (size_t step = 0; step < numSteps; step++)
@@ -106,12 +125,18 @@ int main()
         {
             a[i] = aTemp[i];
         };
-        
-        // Save results of this step to file
-        //TODO
-        cout << "Completeted step: " << step << endl;
-        
+
+        // Save
+        saveArray(a, outFile, numGhosts);
+
+        // Message
+         cout << "Completeted step: " << step << endl;
+
     }; // End of evolution loop
+
+
+    // Close output file
+    outFile.close();
 
     // Stop timer and print execution time. Time options are nanoseconds, 
     // microseconds, milliseconds, seconds, minutes, hours. To pick one just
