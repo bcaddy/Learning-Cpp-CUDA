@@ -28,19 +28,31 @@ start = default_timer()
 
 def main():
     # Load file
-    global file, size
     file = np.loadtxt("results.csv", delimiter=",", usecols=range(1000))
     
     # sim info
     length = 1.
     size = len(file[0,:])
     positions = np.linspace(0.,length,size)
+    
+    # Plotting info
+    numFrames = 100
+    stride = len(file[:,0])//numFrames
+    
+    # Find mins and maxes
+    pad = np.max(np.abs([file.min(), file.max()])) * 0.05
+    small = file.min() - pad
+    large = file.max() + pad
+    
+    
 
-    for i in range(0, len(file[:,0])):
+    for i in range(0, len(file[:,0]), stride):
         plt.figure(1)
         plt.plot(positions,file[i,:],
                  linestyle='-',
                  color='blue')
+        
+        plt.ylim(small, large)
     
         plt.xlabel("Position")
         plt.ylabel("Value of a")
@@ -50,6 +62,7 @@ def main():
         plt.savefig(f'images/{i}.png',
                     bbox='tight',
                     dpi=150)
+        plt.close('all')
 
     if (socket.gethostname()[7:] == "crc.pitt.edu" ):
         os.system("convert images/*.png animated.gif")
