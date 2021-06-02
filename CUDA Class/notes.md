@@ -8,8 +8,8 @@
 ## Kernel Launch Syntax
 - `myKernel<<<N,T>>> (args)`
 - the N,1 is the kernel launch configuration
-- N = number of blocks. Indicates how many blocks to launch
-- T = Number of threads,
+- N = number of blocks. Indicates how many blocks to launch. Can be of type dim3
+- T = Number of threads, can be of type dim3
 - Hierarchy
   - Grid: all blocks and threads
   - Blocks, can contain threads
@@ -27,6 +27,8 @@
 - Thread index = 'threadIdx.x`
   - `threadIdx` has three elements `.x`, `.y`, and `.z`
   - cannot be more than 1024 threads per block
+- Both of these are of type `dim3`. A 3 element structure where each element is
+  referenced with `.x`, `.y`, or `.z`.
 - Global unique index example
   - `int index = threadIdx.x + blockIdx.x * M` where M is the size of each block
   - `M` is usually found with `blockDim.x` which is the size of the blocks in
@@ -48,3 +50,6 @@
 
 ## Threads vs. Blocks
 - Threads can communicate and synchronize within a block but not between blocks
+
+## Misc.
+- `cudaDeviceSynchronize()` synchronizes host and device
