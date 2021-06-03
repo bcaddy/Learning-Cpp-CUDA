@@ -53,3 +53,42 @@
 
 ## Misc.
 - `cudaDeviceSynchronize()` synchronizes host and device
+
+
+
+
+# 2. Shared Memory
+
+## Stencil Operation
+- Use a certain number of grid points on either side of the 'center' point to
+  produce a new center point
+- Has a width and radius. The radius is the number of points on either side to
+  be used. The width is 2x radius + 1 for the center point
+- Threads can generally run in any order, so you still need to make sure
+  blocks/synchronizes are there to avoid race conditions etc
+  - `__syncthreads()` is the block level barrier. Does not operate between Blocks
+  - all threads MUST be able to hit the `__syncthreads()`. I.e. you can use it
+    in a conditional
+
+## Shared Memory
+- shared memory is on-chip memory similar to cache on a CPU
+  - it used user managed unlike a cache though
+  - Limited to ~48 kB per thread block. I.e. ~6,000 doubles
+- ~5 times faster than global memory, i.e. memory on external DRAM chips
+- shared between threads in a block but not between blocks
+- declaration syntax: `__shared__ int arrName[BLOCK_SIZE + 2 * RADIUS]`
+  - called inside of kernels
+  - Dynamic (i.e. run time) memory is allocated by omiting the size of the array
+    (i.e. just `int arrName[]`) then passing a third argument in the triple
+    chevron that is the size in bytes. i.e. `kernelLaunch<<<grid, block,
+    shared_size_in_bytes>>>(args)`
+  - Might need to add `extern` keyword in front of `__shared__` for dynamic memory
+- Now we'll need a global index and an index for shared/local memory
+  - `int lindex = threadIdx.x + RADIUS`
+- Read in memory
+  - Read in the non-halo/ghost pixels `temp[lindex = inputArr[globalIndex]`
+  - Read in halo pixels: Do the same thing but only with the first RADIUS
+    threads to load in the halo
+- Save results in global memory since we won't need it multiple times
+- Communication can happen in shared memory via writing with one thread and
+  reading with another
