@@ -92,3 +92,37 @@
 - Save results in global memory since we won't need it multiple times
 - Communication can happen in shared memory via writing with one thread and
   reading with another
+
+
+# 3-4. Cuda Optimization
+
+## Warps
+- a thread block consists of 1 or more warps of 32 threads
+- a warp is executed physically in parallel on SM
+- all instructions are warp wide and all threads in the warp operate in lockstep
+- Threads per block should be a multiple of the warp size
+
+## Launch Configuration
+- Instructions are always issued in order. There is no out-of-order-execution
+  like with x86
+  - This is not true for warps. Individual threads are executed in order but
+    warps can be executed out of order
+- Memory reads are non-blocking.
+- Threads can stall while waiting for data
+- latency:
+  - Global memory retrieval latency (GMEM) >100 clockcycles, sometimes as high
+    as 400
+  - Arithmetic latency <100 cycles time between instruction issue and
+    instruction completion. Typically 5-10 cycles
+- Launch enough threads to hide latency
+- Limit of 64 warps per SM (i.e. 2048 threads). This should be the goal.
+  Maximize the number of threads. We're shooting for ~160,000 threads per Volta
+  processor
+  - Note that you are limited to 1024 threads per block so you'll usually want
+    to schedule multiple thread blocks per SM. 512 threads per block usually
+    works well
+  - This is equivalent to roughly a 55x55x55 grid in Cholla which is (I think)
+    about 11.25MB worth of grid
+
+# Maximize Global Memory Throughput
+- Try to load large amounts of memory per thread
