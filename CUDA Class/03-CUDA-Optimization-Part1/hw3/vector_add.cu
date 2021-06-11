@@ -14,7 +14,7 @@
     } while (0)
 
 
-const int DSIZE = 32*1048576*2000;
+const int DSIZE = 32*1048576;
 // vector add kernel: C = A + B
 __global__ void vadd(const float *A, const float *B, float *C, int ds){
 
