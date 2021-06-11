@@ -1,0 +1,38 @@
+==WARNING== Could not deploy stock section files to "/ccs/home/rcaddy/Documents/NVIDIA Nsight Compute/2021.1.0/Sections".
+==WARNING== Using "/autofs/nccs-svm1_sw/summit/nsight-compute/2021.1.0/target/linux-desktop-glibc_2_19_0-ppc64le/../../sections" instead.
+==WARNING== See https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#faq.
+==PROF== Connected to process 63973 (/autofs/nccs-svm1_home1/rcaddy/Learning-Cpp-CUDA/CUDA Class/03-CUDA-Optimization-Part1/hw3/vector_add.exe)
+==PROF== Profiling "vadd" - 1: 0%....50%....100% - 20 passes
+==PROF== Disconnected from process 63973
+A[0] = 0.840188
+B[0] = 0.394383
+C[0] = 1.234571
+[63973] vector_add.exe@127.0.0.1
+  vadd(float const*, float const*, float*, int), 2021-Jun-11 14:07:59, Context 1, Stream 7
+    Section: GPU Speed Of Light
+    ---------------------------------------------------------------------- --------------- ------------------------------
+    DRAM Frequency                                                           cycle/usecond                         866.90
+    SM Frequency                                                             cycle/nsecond                           1.30
+    Elapsed Cycles                                                                   cycle                         636590
+    Memory [%]                                                                           %                          91.70
+    SOL DRAM                                                                             %                          91.70
+    Duration                                                                       usecond                         491.30
+    SOL L1/TEX Cache                                                                     %                          24.71
+    SOL L2 Cache                                                                         %                          31.98
+    SM Active Cycles                                                                 cycle                      626500.40
+    SM [%]                                                                               %                           6.20
+    ---------------------------------------------------------------------- --------------- ------------------------------
+    OK    The kernel is utilizing greater than 80.0% of the available compute or memory performance of the device. To   
+          further improve performance, work will likely need to be shifted from the most utilized to another unit.      
+          Start by analyzing workloads in the Memory Workload Analysis section.                                         
+
+    Section: Memory Workload Analysis
+    ---------------------------------------------------------------------- --------------- ------------------------------
+    Memory Throughput                                                         Gbyte/second                         814.03
+    Mem Busy                                                                             %                          31.98
+    Max Bandwidth                                                                        %                          91.70
+    L1/TEX Hit Rate                                                                      %                              0
+    L2 Hit Rate                                                                          %                          33.33
+    Mem Pipes Busy                                                                       %                           6.20
+    ---------------------------------------------------------------------- --------------- ------------------------------
+
