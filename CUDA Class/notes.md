@@ -124,5 +124,46 @@
   - This is equivalent to roughly a 55x55x55 grid in Cholla which is (I think)
     about 11.25MB worth of grid
 
-# Maximize Global Memory Throughput
+## Memory Hierarchy
+- Arranged fastest to slowest/closest to processor to farthest
+  - Local storage: Registers mostly, managed by compiler
+  - Shared Memory/L1 Cache:
+    - Shared memory is on chip and can be managed by the programmer. Typically
+      48, 64, or 96 KB of shared memory
+    - L1 Cache: Compiler managed. Per SM/Per block resource
+  - L2 Cache: All accesses go through this, is device wide
+  - Constant and Texture Caches: fixme idk what these are. They might be purely
+    logical
+  - Global Memory: latency in hundreds of cycles, throughput is ~900 GB/s (V100)
+- **Writing**
+  - Invalidate the updated data in L1 and update the value in L2 to later be
+    written to global memory
+- **Non-Caching**: Just skip requests to L1. Can be used to communicate between
+  blocks by forcing the threads to go to L2. Can sometimes increase performance
+  slightly
+
+## Load Operation
+- Run warp wide, though each thread can request different memory
 - Try to load large amounts of memory per thread
+- Loading consecutive memory locations is usually much faster and uses the bus
+  more efficiently
+- Getting a single value (like gamma) from memory is very bus inefficient and
+  occasionally is fine but should be avoided if possible. Try to deal with this
+  by maybe loading multiple things like that in a single vector/array
+- Requesting random bytes is worst case just like the single value request. This
+  could be an issue with MHD/Constrained Transport
+  - non-caching loads can improve this. L1 cache requires 128 byte loads but
+    global memory only requires 32 byte loads. So on semi-random loads you can
+    significantly improve efficiency with non-caching loads
+  - Since all the CT fields are used this probably isn't a huge issue
+
+## Shared Memory
+- 32 banks of 4 byte sections
+- Bank 0 has bytes 0-3 and 128-131
+- Think about it like a 2D array. 32 banks wide and X rows high where X is
+  either the total size or just enough for your usage
+- every bank can read out simultaneously, but only 4 bytes per bank
+- Try to access all bank simultaneously, avoid accessing one bank many many
+  times at once, can be done with 'padding'. Add an extra 4 bytes to the end of
+  each "row", this will offset memory and allow both columnar and row access at
+  nearly full speed
