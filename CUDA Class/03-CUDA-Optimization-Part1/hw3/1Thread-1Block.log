@@ -1,0 +1,37 @@
+==WARNING== Could not deploy stock section files to "/ccs/home/rcaddy/Documents/NVIDIA Nsight Compute/2021.1.0/Sections".
+==WARNING== Using "/autofs/nccs-svm1_sw/summit/nsight-compute/2021.1.0/target/linux-desktop-glibc_2_19_0-ppc64le/../../sections" instead.
+==WARNING== See https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#faq.
+==PROF== Connected to process 64051 (/autofs/nccs-svm1_home1/rcaddy/Learning-Cpp-CUDA/CUDA Class/03-CUDA-Optimization-Part1/hw3/vector_add.exe)
+==PROF== Profiling "vadd" - 1: 0%....50%....100% - 20 passes
+==PROF== Disconnected from process 64051
+A[0] = 0.840188
+B[0] = 0.394383
+C[0] = 1.234571
+[64051] vector_add.exe@127.0.0.1
+  vadd(float const*, float const*, float*, int), 2021-Jun-11 14:09:58, Context 1, Stream 7
+    Section: GPU Speed Of Light
+    ---------------------------------------------------------------------- --------------- ------------------------------
+    DRAM Frequency                                                           cycle/usecond                         877.52
+    SM Frequency                                                             cycle/nsecond                           1.31
+    Elapsed Cycles                                                                   cycle                     3518103972
+    Memory [%]                                                                           %                           0.04
+    SOL DRAM                                                                             %                           0.02
+    Duration                                                                        second                           2.68
+    SOL L1/TEX Cache                                                                     %                           2.86
+    SOL L2 Cache                                                                         %                           0.03
+    SM Active Cycles                                                                 cycle                    43972985.33
+    SM [%]                                                                               %                           0.04
+    ---------------------------------------------------------------------- --------------- ------------------------------
+    WRN   This kernel grid is too small to fill the available resources on this device, resulting in only 0.0 full      
+          waves across all SMs. Look at Launch Statistics for more details.                                             
+
+    Section: Memory Workload Analysis
+    ---------------------------------------------------------------------- --------------- ------------------------------
+    Memory Throughput                                                         Mbyte/second                         162.66
+    Mem Busy                                                                             %                           0.04
+    Max Bandwidth                                                                        %                           0.04
+    L1/TEX Hit Rate                                                                      %                          90.62
+    L2 Hit Rate                                                                          %                          90.13
+    Mem Pipes Busy                                                                       %                           0.04
+    ---------------------------------------------------------------------- --------------- ------------------------------
+
