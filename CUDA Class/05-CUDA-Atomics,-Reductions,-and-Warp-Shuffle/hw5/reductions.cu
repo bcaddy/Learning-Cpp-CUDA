@@ -14,11 +14,16 @@
     } while (0)
 
 
-const size_t N = 8ULL*1024ULL*1024ULL;  // data size
+// const size_t N = 8ULL*1024ULL*1024ULL;  // data size
+// const size_t N = 640ULL * 256UL;  // data size
+const size_t N = 32ULL*1024ULL*1024ULL;;// data size
 //const size_t N = 256*640; // data size
 const int BLOCK_SIZE = 256;  // CUDA maximum is 1024
 // naive atomic reduction kernel
-__global__ void atomic_red(const float *gdata, float *out){
+__global__ void atomic_red(const float *gdata, float
+
+
+   *out){
   size_t idx = threadIdx.x+blockDim.x*blockIdx.x;
   if (idx < N) atomicAdd(out, gdata[idx]);
 }
@@ -31,7 +36,7 @@ __global__ void reduce(float *gdata, float *out){
 
      while (idx < N) {  // grid stride loop to load data
         sdata[tid] += gdata[idx];
-        idx += gridDim.x*blockDim.x;  
+        idx += gridDim.x*blockDim.x;
         }
 
      for (unsigned int s=blockDim.x/2; s>0; s>>=1) {
@@ -50,7 +55,7 @@ __global__ void reduce(float *gdata, float *out){
 
      while (idx < N) {  // grid stride loop to load data
         sdata[tid] += gdata[idx];
-        idx += gridDim.x*blockDim.x;  
+        idx += gridDim.x*blockDim.x;
         }
 
      for (unsigned int s=blockDim.x/2; s>0; s>>=1) {
@@ -70,13 +75,13 @@ __global__ void reduce_ws(float *gdata, float *out){
      unsigned mask = 0xFFFFFFFFU;
      int lane = threadIdx.x % warpSize;
      int warpID = threadIdx.x / warpSize;
-     while (idx < N) {  // grid stride loop to load 
+     while (idx < N) {  // grid stride loop to load
         val += gdata[idx];
-        idx += gridDim.x*blockDim.x;  
+        idx += gridDim.x*blockDim.x;
         }
 
  // 1st warp-shuffle reduction
-    for (int offset = warpSize/2; offset > 0; offset >>= 1) 
+    for (int offset = warpSize/2; offset > 0; offset >>= 1)
        val += __shfl_down_sync(mask, val, offset);
     if (lane == 0) sdata[warpID] = val;
    __syncthreads(); // put warp results in shared mem
@@ -87,7 +92,7 @@ __global__ void reduce_ws(float *gdata, float *out){
        val = (tid < blockDim.x/warpSize)?sdata[lane]:0;
 
  // final warp-shuffle reduction
-       for (int offset = warpSize/2; offset > 0; offset >>= 1) 
+       for (int offset = warpSize/2; offset > 0; offset >>= 1)
           val += __shfl_down_sync(mask, val, offset);
 
        if  (tid == 0) atomicAdd(out, val);
@@ -149,4 +154,4 @@ int main(){
   printf("reduction warp shuffle sum correct!\n");
   return 0;
 }
-  
+
