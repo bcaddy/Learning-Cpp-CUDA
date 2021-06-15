@@ -1,0 +1,58 @@
+Job <1084110> is submitted to default queue <batch>.
+==WARNING== Could not deploy stock section files to "/ccs/home/rcaddy/Documents/NVIDIA Nsight Compute/2021.1.0/Sections".
+==WARNING== Using "/autofs/nccs-svm1_sw/summit/nsight-compute/2021.1.0/target/linux-desktop-glibc_2_19_0-ppc64le/../../sections" instead.
+==WARNING== See https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#faq.
+==PROF== Connected to process 3531 (/autofs/nccs-svm1_home1/rcaddy/Learning-Cpp-CUDA/CUDA Class/05-CUDA-Atomics,-Reductions,-and-Warp-Shuffle/hw5/reductions.exe)
+==PROF== Profiling "atomic_red" - 1: 0%....50%....100% - 19 passes
+==PROF== Disconnected from process 3531
+atomic sum reduction incorrect!
+==ERROR== The application returned an error code (255).
+[3531] reductions.exe@127.0.0.1
+  atomic_red(float const*, float*), 2021-Jun-15 14:57:23, Context 1, Stream 7
+    Section: GPU Speed Of Light
+    ---------------------------------------------------------------------- --------------- ------------------------------
+    DRAM Frequency                                                           cycle/usecond                         877.53
+    SM Frequency                                                             cycle/nsecond                           1.31
+    Elapsed Cycles                                                                   cycle                      104246427
+    Memory [%]                                                                           %                           1.03
+    SOL DRAM                                                                             %                           0.19
+    Duration                                                                       msecond                          79.42
+    SOL L1/TEX Cache                                                                     %                           0.83
+    SOL L2 Cache                                                                         %                           1.03
+    SM Active Cycles                                                                 cycle                      104179269
+    SM [%]                                                                               %                           0.40
+    ---------------------------------------------------------------------- --------------- ------------------------------
+    WRN   This kernel exhibits low compute throughput and memory bandwidth utilization relative to the peak performance 
+          of this device. Achieved compute throughput and/or memory bandwidth below 60.0% of peak typically indicate    
+          latency issues. Look at Scheduler Statistics and Warp State Statistics for potential reasons.                 
+
+    Section: Launch Statistics
+    ---------------------------------------------------------------------- --------------- ------------------------------
+    Block Size                                                                                                        256
+    Function Cache Configuration                                                                  cudaFuncCachePreferNone
+    Grid Size                                                                                                      131072
+    Registers Per Thread                                                   register/thread                             16
+    Shared Memory Configuration Size                                                  byte                              0
+    Driver Shared Memory Per Block                                              byte/block                              0
+    Dynamic Shared Memory Per Block                                             byte/block                              0
+    Static Shared Memory Per Block                                              byte/block                              0
+    Threads                                                                         thread                       33554432
+    Waves Per SM                                                                                                   204.80
+    ---------------------------------------------------------------------- --------------- ------------------------------
+
+    Section: Occupancy
+    ---------------------------------------------------------------------- --------------- ------------------------------
+    Block Limit SM                                                                   block                             32
+    Block Limit Registers                                                            block                             16
+    Block Limit Shared Mem                                                           block                             32
+    Block Limit Warps                                                                block                              8
+    Theoretical Active Warps per SM                                                   warp                             64
+    Theoretical Occupancy                                                                %                            100
+    Achieved Occupancy                                                                   %                          85.63
+    Achieved Active Warps Per SM                                                      warp                          54.80
+    ---------------------------------------------------------------------- --------------- ------------------------------
+    WRN   This kernel's theoretical occupancy is not impacted by any block limit. The difference between calculated     
+          theoretical and measured achieved occupancy can be the result of warp scheduling overheads or workload        
+          imbalances during the kernel execution. Load imbalances can occur between warps within a block as well as     
+          across blocks of the same kernel.                                                                             
+
