@@ -167,3 +167,58 @@
   times at once, can be done with 'padding'. Add an extra 4 bytes to the end of
   each "row", this will offset memory and allow both columnar and row access at
   nearly full speed
+
+
+# 5. Atomics, Reductions, and Warp Shuffle
+
+
+## Atomics and Serial Reductions
+- Add: `atomicAdd(*pointer to output*, *value to add*)`
+  - Allows only 1 thread to use the output location at a time
+  - serializes threads
+  - Implemented in L2 Cache
+  - has poor performance
+- **Other Atomics:**
+  - `atomicMax/Min`
+  - `atomicAdd/Sub`
+  - `atomicInc/Dec` increment or decrement value with rollover
+  - `atomicExch/CAS` swap or conditionally swap values
+  - `atomicAnd/Or/Xor` bitwise operations
+  - atomics have different datatypes they work with
+  - `atomicCas` can do lots of interesting things
+  - [Documentation](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#atomic-functions)
+- **Returns**
+  - Atomics return the old value in that location
+  - can be used to choose work items, queue slots, etc. i.e. to order operations
+
+
+## Parallel Reductions & Global Synchronization
+- Options:
+  - Split into different kernels since CUDA executes different kernel calls serially
+  - use atomics
+  - threadblock draining (`threadFenceReduction`, sample code available)
+  - Cooperative Groups - to be covered later
+- General Idea:
+  1. Perform a grid stride loop to account for varying number of threads/data size
+  2. Loop from the highest to lowest level of the reduction with `__syncthreads`
+     keeping stuff synced
+     1. Do a parallel sweep reduction (i.e. x[i] += x[i+threadNum])
+  4. Use atomics to sync between blocks
+
+## Warp Shuffle
+- See slide 21
+- Direct communication between threads without using shared memory
+- Only works *within* a warp
+- API:
+  - `__shfl_sync()` - Copy from arbitrary lane ID
+  - `__shfl_xor_sync()` - Copy from calculated ID
+  - `__shfl_up_sync()` - Copy from lower lane
+  - `__shfl_down_sync()` - Copy from higher lane
+- Both threads must "participate"
+  - Can cause issues with `if` statements that stop certain threads from
+    executing
+- Reduces shared memory usage per thread block. Also reduces shared memory
+  pressure
+- Warp level broadcast
+- warp level sum/atomic aggregation
+  - Reduces the number of atomic operation by a factor of 32
