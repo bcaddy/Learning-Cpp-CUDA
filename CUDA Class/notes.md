@@ -222,3 +222,22 @@
 - Warp level broadcast
 - warp level sum/atomic aggregation
   - Reduces the number of atomic operation by a factor of 32
+
+
+# 6. CUDA Unified/Managed Memory
+- Serves to eliminate the boilerplate code required for moving data to and from
+  the GPU
+- Use a single pointer in device and host code
+- Stops race conditions by only allowing one processor to access data at a time
+- **Demand Paging**
+  - Oversubscription of GPU memory: cudaMalloc doesn't allow more memory to
+    allocated than is available. Demand paging allows to use up to system memory
+  - atomic data access across GPU and system memory
+- `cudaMallocManaged` replaces both device AND system allocators
+- make sure to call `cudaDeviceSynchronize()` after the kernel and before the
+  data is used elsewhere
+- system wide atomics like `atomicAdd_system`. I think this is node only
+- works really well for linked lists
+- Hide a lot of the latecy with `cudaMemPrefetchAsync`, this mostly loads data
+  in bulk
+- `cudaMemAdvise` and similar inform the Cuda run time that things might want to be moved, usage of data, processor locality
