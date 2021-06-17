@@ -241,3 +241,55 @@
 - Hide a lot of the latecy with `cudaMemPrefetchAsync`, this mostly loads data
   in bulk
 - `cudaMemAdvise` and similar inform the Cuda run time that things might want to be moved, usage of data, processor locality
+
+
+# 7. Concurrency
+
+- Overlapping data movement and computation
+- **CUDA Dynamic Parallelism:** launch kernels from within other kernels
+
+## Pinned (non-pageable) Memory
+- virtual memory is not the sa me as physical DRAM
+- Allows overallocating RAM
+- can cause delays while physical memory is allocated
+- `cudaHostAlloc`/`cudaHostFree` turn off paging and allocate pinned memory
+- `cudaHostRegister`/`cudaHostUnregister` - pin/unpin allocated memory
+
+# Streams
+- `cudaMemcpyAsync` - non-blocking memcopy. Whereas regular Memcpy requires that
+  all previous cuda operations must finish and then the copy has to finish
+- A stream is a sequence of operations execute in issue order on gpu
+- multiple streams can exist at once
+- Must used pinned memory for transfers to and from host
+- `cudaStream_t` - stream data type
+- `cudaStreamCreate` - create stream
+- `cudaStreamQuery` - check if stream is idle
+- `cudaStreamSynchronize` - force CPU to wait
+- `cudaStreamDestroy` - delete stream
+- Try breaking a large parallel operation into several smaller ones then overlap the copying for one stream with the computer for another
+- Stream creation and allocation will totally mess up streaming. Do NOT create them during stream loops
+- 2-3 streams are usually sufficient. If you get to 10 then you're probably doing something wrong
+- **Default Stream:**
+  - Behaves like a regular stream.
+  - If issued beside other streams then IT WILL FORCE ALL OTHER STREAMS TO FINISH. It is blocking across all streams and cannot be issues asynchronously.
+  - *Should not be used by experience programmers*
+  - Can be converted to regular stream, still not reccommended
+- `cudaLaunchHostFunc` - Launch a host code function in a stream to get all the associated ordering
+  - Requires another CPU thread
+  - cannot use CUDA calls in that function
+  - replaces `cudaStreamAdCallback`
+- [Blog Post](
+https://devblogs.nvidia.com/maximizing-unified-memory-performance-cuda/)
+- `cudaEvent` - Markers, used mostly for timing and syncing
+- **Priority**
+  - Set the priority of a stream. Encourages the work distributor to start a higher priority stream first
+  - Will not preempt
+
+## Multi-GPU
+- API calls to find number of devices and switch between the "active device"
+- Can transfer data directly from one gpu to another with MemcpyPeer calls
+
+## CUDA Graphs
+- Allows the creation of a sequence of work items and they will execute according to dependency, priority, etc
+- can eliminate or reduce some latencies
+
