@@ -293,3 +293,28 @@ https://devblogs.nvidia.com/maximizing-unified-memory-performance-cuda/)
 - Allows the creation of a sequence of work items and they will execute according to dependency, priority, etc
 - can eliminate or reduce some latencies
 
+
+
+## 8. GPU Performance Analysis
+
+1. Profile your code
+2. Determine what the biggest limiter/issue is
+3. Study, learn, reflect, inspect the issue
+4. Optimize
+5. Check if your optimization worked
+6. Repeat as needed
+
+## Types of limiters
+- **Memory Bound:**
+  - a memory system is saturated and can't be faster
+- **Compute Bound:**
+  - computing takes a lot of time, computing resources are saturated
+- **Latency Bound:**
+  - Common when neither of the others are a problem
+
+## Occupancy
+- The actual usage of SMs. Goal is 2048 threads per SM
+
+
+## Analyzer
+- Compile with `-lineinfo` for source code info
