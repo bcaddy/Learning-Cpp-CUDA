@@ -295,7 +295,7 @@ https://devblogs.nvidia.com/maximizing-unified-memory-performance-cuda/)
 
 
 
-## 8. GPU Performance Analysis
+# 8. GPU Performance Analysis
 
 1. Profile your code
 2. Determine what the biggest limiter/issue is
@@ -318,3 +318,36 @@ https://devblogs.nvidia.com/maximizing-unified-memory-performance-cuda/)
 
 ## Analyzer
 - Compile with `-lineinfo` for source code info
+
+
+# 9. Cooperative Groups
+- cooperation amongst groups of threads
+- parallel decomps
+- Grid wide synchronizes
+- Pascal and newer only
+- built on C++ objects
+  - base class is `thread group`
+- All cooperative group functionality is withing the `cooperative_group::` namespace
+- `coalesced_threads()`
+- `this_thread_block()`
+- `tiled_partition<>(block)`
+- `this_grid()`
+- `this_multi_grid()`
+- **do not use triple chevron syntax for coop groups**
+  - instead use `cudaLaunchCooperativeKernel()`
+- Cannot exceed the maximum number of threads on the device. i.e. num threads per SM * num SMs = max threads. There are APIs for this. Look it up
+## Methods
+- `sync()`
+- `size()` - total number of threads
+- `thread_rank()` - unique number for thread, can be used as a global unique index?
+- `is_valid()` -
+- `group_index()` -
+- `thread_index()`
+
+## Decomposition
+- Can break grid up into "tiles" of work
+  - must a number of threads less than or equal to 32 and must be a power of 2 i.e. 2,4,8,16, and 32
+
+## Persistant Kernels
+- Keep data in shared memory/Registers
+- solve something iteratively, leader/follower, or producer/consumer algorithms
