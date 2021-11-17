@@ -1,11 +1,15 @@
-# 1.  Cuda Basics
+# CUDA Notes
 
-## Function/Kernel Declaration
+## 1.  Cuda Basics
+
+### Function/Kernel Declaration
+
 - `__global__ void myKernel(argument pointers) {}`
 - `__global__` indicates something that runs on the device and is called from
   the host
 
-## Kernel Launch Syntax
+### Kernel Launch Syntax
+
 - `myKernel<<<N,T>>> (args)`
 - the N,1 is the kernel launch configuration
 - N = number of blocks. Indicates how many blocks to launch. Can be of type dim3
@@ -21,7 +25,8 @@
   - So typically launch looks like `kernel<<< (N + T-1) / T, T>>> (args, N)`
     - where N is the size of the array and T is the number of threads per block
 
-## Indices
+### Indices
+
 - Block index = `blockIdx.x`
   - `blockIdx` has three elements `.x`, `.y`, and `.z`
 - Thread index = 'threadIdx.x`
@@ -34,7 +39,8 @@
   - `M` is usually found with `blockDim.x` which is the size of the blocks in
     direction x. i.e. the number of threads within a block
 
-## Memory Management
+### Memory Management
+
 - `cudaMalloc()`, `cudaFree()`, and `cudaMemcpy()`
 - Usually if `a` is the host pointer then `d_a` is the device pointer
 - syntax:
@@ -48,18 +54,18 @@
 - `size` can be found with `sizeof(type)` then multiply by the number of that
   type
 
-## Threads vs. Blocks
+### Threads vs. Blocks
+
 - Threads can communicate and synchronize within a block but not between blocks
 
-## Misc.
+### Miscellaneous
+
 - `cudaDeviceSynchronize()` synchronizes host and device
 
+## 2. Shared Memory
 
+### Stencil Operation
 
-
-# 2. Shared Memory
-
-## Stencil Operation
 - Use a certain number of grid points on either side of the 'center' point to
   produce a new center point
 - Has a width and radius. The radius is the number of points on either side to
@@ -70,7 +76,8 @@
   - all threads MUST be able to hit the `__syncthreads()`. I.e. you can use it
     in a conditional
 
-## Shared Memory
+### Shared Memory
+
 - shared memory is on-chip memory similar to cache on a CPU
   - it used user managed unlike a cache though
   - Limited to ~48 kB per thread block. I.e. ~6,000 doubles
@@ -93,16 +100,17 @@
 - Communication can happen in shared memory via writing with one thread and
   reading with another
 
+## 3-4. Cuda Optimization
 
-# 3-4. Cuda Optimization
+### Warps
 
-## Warps
 - a thread block consists of 1 or more warps of 32 threads
 - a warp is executed physically in parallel on SM
 - all instructions are warp wide and all threads in the warp operate in lockstep
 - Threads per block should be a multiple of the warp size
 
-## Launch Configuration
+### Launch Configuration
+
 - Instructions are always issued in order. There is no out-of-order-execution
   like with x86
   - This is not true for warps. Individual threads are executed in order but
@@ -124,7 +132,8 @@
   - This is equivalent to roughly a 55x55x55 grid in Cholla which is (I think)
     about 11.25MB worth of grid
 
-## Memory Hierarchy
+### Memory Hierarchy
+
 - Arranged fastest to slowest/closest to processor to farthest
   - Local storage: Registers mostly, managed by compiler
   - Shared Memory/L1 Cache:
@@ -142,7 +151,8 @@
   blocks by forcing the threads to go to L2. Can sometimes increase performance
   slightly
 
-## Load Operation
+### Load Operation
+
 - Run warp wide, though each thread can request different memory
 - Try to load large amounts of memory per thread
 - Loading consecutive memory locations is usually much faster and uses the bus
@@ -157,7 +167,8 @@
     significantly improve efficiency with non-caching loads
   - Since all the CT fields are used this probably isn't a huge issue
 
-## Shared Memory
+### Shared Memory Optimization
+
 - 32 banks of 4 byte sections
 - Bank 0 has bytes 0-3 and 128-131
 - Think about it like a 2D array. 32 banks wide and X rows high where X is
@@ -168,11 +179,10 @@
   each "row", this will offset memory and allow both columnar and row access at
   nearly full speed
 
+## 5. Atomics, Reductions, and Warp Shuffle
 
-# 5. Atomics, Reductions, and Warp Shuffle
+### Atomics and Serial Reductions
 
-
-## Atomics and Serial Reductions
 - Add: `atomicAdd(*pointer to output*, *value to add*)`
   - Allows only 1 thread to use the output location at a time
   - serializes threads
@@ -191,8 +201,8 @@
   - Atomics return the old value in that location
   - can be used to choose work items, queue slots, etc. i.e. to order operations
 
+### Parallel Reductions & Global Synchronization
 
-## Parallel Reductions & Global Synchronization
 - Options:
   - Split into different kernels since CUDA executes different kernel calls serially
   - use atomics
@@ -203,9 +213,10 @@
   2. Loop from the highest to lowest level of the reduction with `__syncthreads`
      keeping stuff synced
      1. Do a parallel sweep reduction (i.e. x[i] += x[i+threadNum])
-  4. Use atomics to sync between blocks
+  3. Use atomics to sync between blocks
 
-## Warp Shuffle
+### Warp Shuffle
+
 - See slide 21
 - Direct communication between threads without using shared memory
 - Only works *within* a warp
@@ -223,8 +234,8 @@
 - warp level sum/atomic aggregation
   - Reduces the number of atomic operation by a factor of 32
 
+## 6. CUDA Unified/Managed Memory
 
-# 6. CUDA Unified/Managed Memory
 - Serves to eliminate the boilerplate code required for moving data to and from
   the GPU
 - Use a single pointer in device and host code
@@ -242,20 +253,21 @@
   in bulk
 - `cudaMemAdvise` and similar inform the Cuda run time that things might want to be moved, usage of data, processor locality
 
-
-# 7. Concurrency
+## 7. Concurrency
 
 - Overlapping data movement and computation
 - **CUDA Dynamic Parallelism:** launch kernels from within other kernels
 
-## Pinned (non-pageable) Memory
+### Pinned (non-pageable) Memory
+
 - virtual memory is not the sa me as physical DRAM
 - Allows overallocating RAM
 - can cause delays while physical memory is allocated
 - `cudaHostAlloc`/`cudaHostFree` turn off paging and allocate pinned memory
 - `cudaHostRegister`/`cudaHostUnregister` - pin/unpin allocated memory
 
-# Streams
+## Streams
+
 - `cudaMemcpyAsync` - non-blocking memcopy. Whereas regular Memcpy requires that
   all previous cuda operations must finish and then the copy has to finish
 - A stream is a sequence of operations execute in issue order on gpu
@@ -285,17 +297,17 @@ https://devblogs.nvidia.com/maximizing-unified-memory-performance-cuda/)
   - Set the priority of a stream. Encourages the work distributor to start a higher priority stream first
   - Will not preempt
 
-## Multi-GPU
+### Multi-GPU
+
 - API calls to find number of devices and switch between the "active device"
 - Can transfer data directly from one gpu to another with MemcpyPeer calls
 
-## CUDA Graphs
+### CUDA Graphs
+
 - Allows the creation of a sequence of work items and they will execute according to dependency, priority, etc
 - can eliminate or reduce some latencies
 
-
-
-# 8. GPU Performance Analysis
+## 8. GPU Performance Analysis
 
 1. Profile your code
 2. Determine what the biggest limiter/issue is
@@ -304,7 +316,8 @@ https://devblogs.nvidia.com/maximizing-unified-memory-performance-cuda/)
 5. Check if your optimization worked
 6. Repeat as needed
 
-## Types of limiters
+### Types of limiters
+
 - **Memory Bound:**
   - a memory system is saturated and can't be faster
 - **Compute Bound:**
@@ -312,17 +325,18 @@ https://devblogs.nvidia.com/maximizing-unified-memory-performance-cuda/)
 - **Latency Bound:**
   - Common when neither of the others are a problem
 
-## Occupancy
+### Occupancy
+
 - The actual usage of SMs. Goal is 2048 threads per SM
 
+### Analyzer
 
-## Analyzer
 - Compile with `-lineinfo` for source code info
 
+## 9. Cooperative Groups
 
-# 9. Cooperative Groups
 - cooperation amongst groups of threads
-- parallel decomps
+- parallel decomposition
 - Grid wide synchronizes
 - Pascal and newer only
 - built on C++ objects
@@ -336,7 +350,9 @@ https://devblogs.nvidia.com/maximizing-unified-memory-performance-cuda/)
 - **do not use triple chevron syntax for coop groups**
   - instead use `cudaLaunchCooperativeKernel()`
 - Cannot exceed the maximum number of threads on the device. i.e. num threads per SM * num SMs = max threads. There are APIs for this. Look it up
-## Methods
+
+### Methods
+
 - `sync()`
 - `size()` - total number of threads
 - `thread_rank()` - unique number for thread, can be used as a global unique index?
@@ -344,10 +360,12 @@ https://devblogs.nvidia.com/maximizing-unified-memory-performance-cuda/)
 - `group_index()` -
 - `thread_index()`
 
-## Decomposition
+### Decomposition
+
 - Can break grid up into "tiles" of work
   - must a number of threads less than or equal to 32 and must be a power of 2 i.e. 2,4,8,16, and 32
 
-## Persistant Kernels
+### Persistant Kernels
+
 - Keep data in shared memory/Registers
 - solve something iteratively, leader/follower, or producer/consumer algorithms
